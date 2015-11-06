@@ -133,6 +133,46 @@ class ApiController extends BaseController {
         return Response::json($all_gall->toArray());
     }
 
+    public function getAllGallery() {
+        $all = Input::get('all', true);
+        $all_active_gallery = Gallery::with('picture')
+                ->orderBy('id', 'desc');
+        if ($all) {
+            $all_active_gallery->whereIn('status', array('waiting', 'zip'));
+        }
+
+        $all_gallery = $all_active_gallery->get();
+
+        if (count($all_gallery)) {
+            $mark_as_array = $all_gallery->toArray();
+            foreach ($mark_as_array as &$each_rec) {
+                $temp_pic = Picture::select('id', 'created_at', 'name')
+                        ->where('gallery_id', $each_rec['id'])
+                        ->orderBy('id', 'desc')
+                        ->first();
+                
+                if ($temp_pic) {
+                    $temp_pic = $temp_pic->toArray();
+                    $temp_pic['url'] = asset("gallery/{$each_rec['id']}/zip/{$temp_pic['name']}");
+                    $temp_pic['thumb'] = asset("gallery/{$each_rec['id']}/thumb_{$temp_pic['name']}");
+                }
+                $each_rec['picture'] = $temp_pic;
+                $each_rec['zip_url'] = $each_rec['status'] == "zip" ? asset("gallery/{$each_rec['id']}/gallery_{$each_rec['id']}.zip") : NULL;
+            }
+
+            $resp = array(
+                'code' => 200,
+                'result' => $mark_as_array
+            );
+        } else {
+            $resp = array(
+                'code' => 400
+            );
+        }
+
+        return Response::json($resp);
+    }
+
     public function getPictureGallery() {
         /**
          * Get All Pic in Gallery
