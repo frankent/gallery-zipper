@@ -27,7 +27,7 @@ $app = new Illuminate\Foundation\Application;
 $env = $app->detectEnvironment(array(
 
 	'local' => array('homestead','*.dev'),
-        'host_prodution' => array('gallery.chiangmaijungletrekking.com')
+        'host_prodution' => array('srv43.main-hosting.eu')
 
 ));
 
