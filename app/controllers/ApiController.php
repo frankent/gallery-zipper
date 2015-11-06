@@ -135,8 +135,7 @@ class ApiController extends BaseController {
 
     public function getAllGallery() {
         $all = Input::get('all', true);
-        $all_active_gallery = Gallery::with('picture')
-                ->orderBy('id', 'desc');
+        $all_active_gallery = Gallery::orderBy('id', 'desc');
         if ($all) {
             $all_active_gallery->whereIn('status', array('waiting', 'zip'));
         }
