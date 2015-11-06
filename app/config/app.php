@@ -122,8 +122,6 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
                 'Chumper\Zipper\ZipperServiceProvider',
-                'Darsain\Console\ConsoleServiceProvider',
-                'Kmd\Logviewer\LogviewerServiceProvider'
 	),
 
 	/*
