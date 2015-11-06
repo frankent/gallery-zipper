@@ -90,7 +90,7 @@ class ApiController extends BaseController {
         /**
          * Save Change
          */
-        $new_pic = new Picture;
+        $new_pic = new Pictures;
         $new_pic->gallery_id = $gallery_id;
         $new_pic->name = $file_name;
         $new_pic->save();
@@ -146,7 +146,7 @@ class ApiController extends BaseController {
         if (count($all_gallery)) {
             $mark_as_array = $all_gallery->toArray();
             foreach ($mark_as_array as &$each_rec) {
-                $temp_pic = Picture::select('id', 'created_at', 'name')
+                $temp_pic = Pictures::select('id', 'created_at', 'name')
                         ->where('gallery_id', $each_rec['id'])
                         ->orderBy('id', 'desc')
                         ->first();

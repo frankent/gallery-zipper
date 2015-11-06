@@ -11,6 +11,6 @@
  *
  * @author keitt
  */
-class Picture extends Eloquent {
+class Pictures extends Eloquent {
     public $table = 'picture';
 }
