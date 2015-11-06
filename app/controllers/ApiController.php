@@ -97,6 +97,7 @@ class ApiController extends BaseController {
     }
 
     public function postUploadImage() {
+        set_time_limit(0);
         $resp = array();
         if (Input::hasFile('media')) {
             $gallery_id = Input::get('gallery_id');
