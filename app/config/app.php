@@ -26,7 +26,7 @@ return array(
 	|
 	*/
 
-	'url' => 'http://gallery.chiangmaijungletrekking.com/',
+	'url' => 'http://localhost',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -122,6 +122,7 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
                 'Chumper\Zipper\ZipperServiceProvider',
+                'Intervention\Image\ImageServiceProvider'
 	),
 
 	/*
@@ -188,7 +189,8 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
-                'Zipper' => 'Chumper\Zipper\Zipper'
+                'Zipper' => 'Chumper\Zipper\Zipper',
+                'Image' => 'Intervention\Image\Facades\Image'
 
 	),
 

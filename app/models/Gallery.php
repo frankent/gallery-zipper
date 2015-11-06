@@ -13,4 +13,7 @@
  */
 class Gallery extends Eloquent {
     public $table = 'gallery';
+    public function picture(){
+        return $this->hasMany('picture');
+    }
 }

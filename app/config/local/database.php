@@ -1,6 +1,8 @@
 <?php
 
 return array(
+    'fetch' => PDO::FETCH_CLASS,
+    'default' => 'mysql',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -22,7 +24,7 @@ return array(
 
 		'mysql' => array(
 			'driver'    => 'mysql',
-			'host'      => 'localhost',
+			'host'      => '127.0.0.1',
 			'database'  => 'toto_gallery',
 			'username'  => 'root',
 			'password'  => '',

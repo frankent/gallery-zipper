@@ -26,8 +26,8 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('*.dev'),
-        'prodution' => array('*.com')
+	'local' => array('homestead','*.dev'),
+        'host_prodution' => array('server43.hostinger.in.th')
 
 ));
 
