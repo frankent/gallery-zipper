@@ -90,7 +90,7 @@ class ApiController extends BaseController {
         /**
          * Save Change
          */
-        $new_pic = new Pictures;
+        $new_pic = new GalleryPicture;
         $new_pic->gallery_id = $gallery_id;
         $new_pic->name = $file_name;
         $new_pic->save();
@@ -160,7 +160,7 @@ class ApiController extends BaseController {
         if (count($all_gallery)) {
             $mark_as_array = $all_gallery->toArray();
             foreach ($mark_as_array as &$each_rec) {
-                $temp_pic = Pictures::select('id', 'created_at', 'name')
+                $temp_pic = GalleryPicture::select('id', 'created_at', 'name')
                         ->where('gallery_id', $each_rec['id'])
                         ->orderBy('id', 'desc')
                         ->first();
@@ -170,7 +170,7 @@ class ApiController extends BaseController {
                     $temp_pic['url'] = asset("gallery/{$each_rec['id']}/zip/{$temp_pic['name']}");
                     $temp_pic['thumb'] = asset("gallery/{$each_rec['id']}/thumb_{$temp_pic['name']}");
                 }
-                $each_rec['pictures'] = $temp_pic;
+                $each_rec['gallery_picture'] = $temp_pic;
                 $each_rec['zip_url'] = $each_rec['status'] == "zip" ? asset("gallery/{$each_rec['id']}/gallery_{$each_rec['id']}.zip") : NULL;
             }
 
@@ -195,11 +195,11 @@ class ApiController extends BaseController {
         $gallery_id = Input::get('gallery_id', null);
         $valid = Validator::make(array('gallery_id' => $gallery_id), array('gallery_id' => 'required|numeric|exists:gallery,id'));
         if ($valid->passes()) {
-            $all_active_gallery = Gallery::with('pictures')
+            $all_active_gallery = Gallery::with('gallery_picture')
                     ->orderBy('id', 'desc')
                     ->find($gallery_id);
             $all_active_gallery = $all_active_gallery->toArray();
-            foreach ($all_active_gallery['pictures'] as &$each_picture) {
+            foreach ($all_active_gallery['gallery_picture'] as &$each_picture) {
                 unset($each_picture['gallery_id']);
                 unset($each_picture['updated_at']);
                 $each_picture['url'] = asset("gallery/{$all_active_gallery['id']}/zip/{$each_picture['name']}");
@@ -229,7 +229,7 @@ class ApiController extends BaseController {
             $path = public_path("gallery/{$gallery_id}");
             $delete_result = File::deleteDirectory($path);
             if ($delete_result) {
-                Pictures::where('gallery_id', $gallery_id)->delete();
+                GalleryPicture::where('gallery_id', $gallery_id)->delete();
                 Gallery::where('id', $gallery_id)->delete();
                 $resp = array('code' => 200);
             } else {
@@ -246,13 +246,13 @@ class ApiController extends BaseController {
         $resp = array();
         $valid = Validator::make(array('picture_id' => $picture_id), array('picture_id' => 'required|exists:picture,id|numeric'));
         if ($valid->passes()) {
-            $picture_info = Pictures::find($picture_id);
+            $picture_info = GalleryPicture::find($picture_id);
             $thumb_path = public_path("gallery/{$picture_info->gallery_id}/thumb_{$picture_info->name}");
             $full_path = public_path("gallery/{$picture_info->gallery_id}/zip/{$picture_info->name}");
             File::delete($thumb_path);
             $delete_result = File::delete($full_path);
             if ($delete_result) {
-                Pictures::where('id', $picture_id)->delete();
+                GalleryPicture::where('id', $picture_id)->delete();
                 $resp = array('code' => 200);
             } else {
                 $resp = array('code' => 500, 'result' => array($thumb_path, $full_path));
