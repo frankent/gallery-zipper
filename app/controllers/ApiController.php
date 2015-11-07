@@ -130,7 +130,7 @@ class ApiController extends BaseController {
 
     public function getMakeZip() {
         set_time_limit(0);
-        $all_gall = Gallery::select('id')->where('status', 'waiting')->get();
+        $all_gall = Gallery::select('id')->where('status', 'waiting')->limit(4)->get();
         foreach ($all_gall as $each_gallery) {
             $zip_path = public_path("gallery/{$each_gallery->id}/gallery_{$each_gallery->id}.zip");
             $read_path = public_path("gallery/{$each_gallery->id}/zip");
@@ -144,9 +144,9 @@ class ApiController extends BaseController {
     }
 
     public function getAllGallery() {
-        $all = Input::get('all', true);
+        $all = Input::get('all', 1);
         $all_active_gallery = Gallery::orderBy('id', 'desc');
-        if ($all) {
+        if ($all != 1) {
             $all_active_gallery->whereIn('status', array('waiting', 'zip'));
         }
 
