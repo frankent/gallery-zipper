@@ -14,11 +14,14 @@
 class ApiController extends BaseController {
 
     public function __construct() {
-        
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
     }
 
     public function getCreateAlbum() {
         $temp = new Gallery();
+        $temp->name = NULL;
+        $temp->detail = NULL;
         $temp->save();
         $last_id = $temp->id;
 
@@ -30,7 +33,7 @@ class ApiController extends BaseController {
 
         return Response::json(array(
                     'code' => 200,
-                    'current_id' => $last_id
+                    'result' => $temp
         ));
     }
 
@@ -81,10 +84,7 @@ class ApiController extends BaseController {
         /**
          * Resize Thumb
          */
-        $img->resize(350, 350, function ($constraint) {
-            $constraint->aspectRatio();
-            $constraint->upsize();
-        });
+        $img->fit(350);
         $img->save("{$save_path}/../thumb_{$file_name}");
 
         /**
@@ -94,6 +94,13 @@ class ApiController extends BaseController {
         $new_pic->gallery_id = $gallery_id;
         $new_pic->name = $file_name;
         $new_pic->save();
+        
+        return array(
+            'id' => $new_pic->id,
+            'name' => $new_pic->name,
+            'thumb' => asset("gallery/{$gallery_id}/thumb_{$file_name}"),
+            'url' => asset("gallery/{$gallery_id}/zip/{$file_name}"),
+        );
     }
 
     public function postUploadImage() {
@@ -104,11 +111,14 @@ class ApiController extends BaseController {
 
             $file = Input::file('media');
             if (is_array($file)) {
+                $resp['result'] = array();
                 foreach ($file as $each_file) {
-                    $this->makeFile($each_file, $gallery_id);
+                    $resp['result'][] = $this->makeFile($each_file, $gallery_id);
+                    $resp['multiple'] = true;
                 }
             } else {
-                $this->makeFile($file, $gallery_id);
+                $resp['result'] = $this->makeFile($file, $gallery_id);
+                $resp['multiple'] = false;
             }
 
             $resp['code'] = 200;
@@ -149,13 +159,13 @@ class ApiController extends BaseController {
                         ->where('gallery_id', $each_rec['id'])
                         ->orderBy('id', 'desc')
                         ->first();
-                
+
                 if ($temp_pic) {
                     $temp_pic = $temp_pic->toArray();
                     $temp_pic['url'] = asset("gallery/{$each_rec['id']}/zip/{$temp_pic['name']}");
                     $temp_pic['thumb'] = asset("gallery/{$each_rec['id']}/thumb_{$temp_pic['name']}");
                 }
-                $each_rec['picture'] = $temp_pic;
+                $each_rec['pictures'] = $temp_pic;
                 $each_rec['zip_url'] = $each_rec['status'] == "zip" ? asset("gallery/{$each_rec['id']}/gallery_{$each_rec['id']}.zip") : NULL;
             }
 
@@ -180,11 +190,11 @@ class ApiController extends BaseController {
         $gallery_id = Input::get('gallery_id', null);
         $valid = Validator::make(array('gallery_id' => $gallery_id), array('gallery_id' => 'required|numeric|exists:gallery,id'));
         if ($valid->passes()) {
-            $all_active_gallery = Gallery::with('picture')
+            $all_active_gallery = Gallery::with('pictures')
                     ->orderBy('id', 'desc')
                     ->find($gallery_id);
             $all_active_gallery = $all_active_gallery->toArray();
-            foreach ($all_active_gallery['picture'] as &$each_picture) {
+            foreach ($all_active_gallery['pictures'] as &$each_picture) {
                 unset($each_picture['gallery_id']);
                 unset($each_picture['updated_at']);
                 $each_picture['url'] = asset("gallery/{$all_active_gallery['id']}/zip/{$each_picture['name']}");
@@ -203,6 +213,48 @@ class ApiController extends BaseController {
             );
         }
 
+        return Response::json($resp);
+    }
+
+    public function getDelGallery($gallery_id = null) {
+        $gallery_id = is_null($gallery_id) ? Input::get('gallery_id', null) : $gallery_id;
+        $resp = array();
+        $valid = Validator::make(array('gallery_id' => $gallery_id), array('gallery_id' => 'required|exists:gallery,id|numeric'));
+        if ($valid->passes()) {
+            $path = public_path("gallery/{$gallery_id}");
+            $delete_result = File::deleteDirectory($path);
+            if ($delete_result) {
+                Pictures::where('gallery_id', $gallery_id)->delete();
+                Gallery::where('id', $gallery_id)->delete();
+                $resp = array('code' => 200);
+            } else {
+                $resp = array('code' => 500);
+            }
+        } else {
+            $resp = array('code' => 400);
+        }
+        return Response::json($resp);
+    }
+
+    public function getDelPicture($picture_id = null) {
+        $picture_id = is_null($picture_id) ? Input::get('picture_id', null) : $picture_id;
+        $resp = array();
+        $valid = Validator::make(array('picture_id' => $picture_id), array('picture_id' => 'required|exists:picture,id|numeric'));
+        if ($valid->passes()) {
+            $picture_info = Pictures::find($picture_id);
+            $thumb_path = public_path("gallery/{$picture_info->gallery_id}/thumb_{$picture_info->name}");
+            $full_path = public_path("gallery/{$picture_info->gallery_id}/zip/{$picture_info->name}");
+            File::delete($thumb_path);
+            $delete_result = File::delete($full_path);
+            if ($delete_result) {
+                Pictures::where('id', $picture_id)->delete();
+                $resp = array('code' => 200);
+            } else {
+                $resp = array('code' => 500, 'result' => array($thumb_path, $full_path));
+            }
+        } else {
+            $resp = array('code' => 400);
+        }
         return Response::json($resp);
     }
 
