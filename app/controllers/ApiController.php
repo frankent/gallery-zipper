@@ -134,6 +134,11 @@ class ApiController extends BaseController {
         foreach ($all_gall as $each_gallery) {
             $zip_path = public_path("gallery/{$each_gallery->id}/gallery_{$each_gallery->id}.zip");
             $read_path = public_path("gallery/{$each_gallery->id}/zip");
+            
+            if(File::exists($zip_path)){
+                File::delete($zip_path);
+            }
+            
             Zipper::make($zip_path)->add($read_path);
             $gallery_id = Gallery::find($each_gallery->id);
             $gallery_id->status = "zip";
