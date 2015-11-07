@@ -7,13 +7,10 @@
  */
 
 /**
- * Description of Gallery
+ * Description of Picture
  *
  * @author keitt
  */
-class Gallery extends Eloquent {
-    public $table = 'gallery';
-    public function gallery_picture(){
-        return $this->hasMany('GalleryPicture');
-    }
+class GalleryPicture extends Eloquent {
+    public $table = 'picture';
 }
