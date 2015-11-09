@@ -142,6 +142,8 @@ class ApiController extends BaseController {
                     $temp->status = 'waiting';
                     $temp->save();
                 }
+            }else{
+                $this->getDelGallery($each_gallery->id);
             }
         }
     }
