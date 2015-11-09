@@ -129,7 +129,7 @@ class ApiController extends BaseController {
     }
     
     private function recheckZip(){
-        $all_zip = Gallery::where('id', 'created_at')->where('status', 'zip')->get();
+        $all_zip = Gallery::select('id', 'created_at')->where('status', 'zip')->get();
         foreach($all_zip as $each_gallery){
             
             $current = time();
