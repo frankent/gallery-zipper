@@ -127,18 +127,37 @@ class ApiController extends BaseController {
         }
         return Response::json($resp);
     }
+    
+    private function recheckZip(){
+        $all_zip = Gallery::where('id', 'created_at')->where('status', 'zip')->get();
+        foreach($all_zip as $each_gallery){
+            
+            $current = time();
+            $album_time = strtotime($each_gallery->created_at) + 2592000;
+            
+            if(($album_time - $current) > 0){
+                $zip_path = public_path("gallery/{$each_gallery->id}/gallery_{$each_gallery->id}.zip");
+                if(!File::exists($zip_path)){
+                    $temp = Gallery::find($each_gallery->id);
+                    $temp->status = 'waiting';
+                    $temp->save();
+                }
+            }
+        }
+    }
 
     public function getMakeZip() {
         set_time_limit(0);
-        $limit = Input::get('limit', 1);
+        $this->recheckZip();
+        $limit = Input::get('limit', 2);
         $all_gall = Gallery::select('id')->where('status', 'waiting')->limit($limit)->get();
         foreach ($all_gall as $each_gallery) {
+            $del_path = public_path("gallery/{$each_gallery->id}/gallery_{$each_gallery->id}.*");
             $zip_path = public_path("gallery/{$each_gallery->id}/gallery_{$each_gallery->id}.zip");
             $read_path = public_path("gallery/{$each_gallery->id}/zip");
             
-            if(File::exists($zip_path)){
-                File::delete($zip_path);
-            }
+            @File::delete($del_path);
+
             
             $x = Zipper::make($zip_path)->add($read_path);
             if($x){
