@@ -140,10 +140,12 @@ class ApiController extends BaseController {
                 File::delete($zip_path);
             }
             
-            Zipper::make($zip_path)->add($read_path);
-            $gallery_id = Gallery::find($each_gallery->id);
-            $gallery_id->status = "zip";
-            $gallery_id->save();
+            $x = Zipper::make($zip_path)->add($read_path);
+            if($x){
+                $gallery_id = Gallery::find($each_gallery->id);
+                $gallery_id->status = "zip";
+                $gallery_id->save();
+            }
         }
 
         return Response::json($all_gall->toArray());
