@@ -188,7 +188,7 @@ class ApiController extends BaseController {
             foreach ($mark_as_array as &$each_rec) {
                 $temp_pic = GalleryPicture::select('id', 'created_at', 'name')
                         ->where('gallery_id', $each_rec['id'])
-                        ->orderBy('id', 'desc')
+                        ->orderBy('id', 'asc')
                         ->first();
 
                 if ($temp_pic) {
