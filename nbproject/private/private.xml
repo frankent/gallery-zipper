@@ -2,21 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/vendor/symfony/http-foundation/Symfony/Component/HttpFoundation/File/UploadedFile.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/app/models/Gallery.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/index.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/.gitignore</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/app/models/Pictures.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/app/routes.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/app/config/local/database.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/bootstrap/start.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/.htaccess</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/app/controllers/ApiController.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/app/config/app.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/bootstrap/paths.php</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/composer.json</file>
-            <file>file:/C:/laragon/www/gallery-chiangmaijungletrekking/app/config/database.php</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>
