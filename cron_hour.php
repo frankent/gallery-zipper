@@ -3,7 +3,7 @@
 /**
  * For Shared host use file_get_contents() to access route
  */
-$url = "http://gallery.chiangmaijungletrekking.com/api/make-zip";
+$url = "http://gallery.cloudnds.com/api/make-zip";
 file_get_contents($url);
 
 /**
