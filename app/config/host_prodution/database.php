@@ -23,9 +23,9 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'mysql.hostinger.in.th',
-			'database'  => 'u205704973_gall',
-			'username'  => 'u205704973_toto',
-			'password'  => 'w,j[vd',
+			'database'  => 'u271921624_gall',
+			'username'  => 'u271921624_gall',
+			'password'  => 'w,j[vdsivd',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

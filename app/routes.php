@@ -13,7 +13,7 @@
 
 Route::get('/', function()
 {
-	return View::make('hello');
+	return Redirect::to("http://trycatch.cmrabbit.com");
 });
 
 Route::controller("api", "ApiController");
