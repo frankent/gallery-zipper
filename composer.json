@@ -6,7 +6,8 @@
     "require": {
         "laravel/framework": "4.2.*",
         "chumper/zipper": "0.5.x",
-        "intervention/image": "^2.3"
+        "intervention/image": "^2.3",
+        "kmd/logviewer": "1.2.*"
     },
     "autoload": {
         "classmap": [

@@ -122,7 +122,8 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
                 'Chumper\Zipper\ZipperServiceProvider',
-                'Intervention\Image\ImageServiceProvider'
+                'Intervention\Image\ImageServiceProvider',
+                'Kmd\Logviewer\LogviewerServiceProvider'
 	),
 
 	/*
