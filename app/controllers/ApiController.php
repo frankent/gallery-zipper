@@ -52,12 +52,16 @@ class ApiController extends BaseController {
         $name = Input::get('name', null);
         $detail = Input::get('detail', null);
         $status = Input::get('status', null);
+        $site_id = Input::get("site_id", NULL);
 
-        $pre_varify = array('gallery_id' => $gallery_id, 'name' => $name, 'detail' => $detail);
-        $rules = array('gallery_id' => 'required|exists:gallery,id', 'name' => 'required', 'detail' => 'required');
+        $pre_varify = array('gallery_id' => $gallery_id, 'name' => $name, 'detail' => $detail, 'site_id' => $site_id);
+        $rules = array('gallery_id' => 'required|exists:gallery,id', 'name' => 'required', 'detail' => 'required', 'site_id' => 'required');
         $valid = Validator::make($pre_varify, $rules);
         if ($valid->passes()) {
-            $temp = Gallery::find($gallery_id);
+            $temp = Gallery::where('id', $gallery_id)
+                    ->where('site_id', $site_id)
+                    ->first();
+            
             $temp->name = $name;
             $temp->detail = $detail;
             if (!is_null($status)) {
@@ -236,11 +240,15 @@ class ApiController extends BaseController {
          */
         $resp = array();
         $gallery_id = Input::get('gallery_id', null);
-        $valid = Validator::make(array('gallery_id' => $gallery_id), array('gallery_id' => 'required|numeric|exists:gallery,id'));
+        $site_id = Input::get('site_id', NULL);
+        $valid = Validator::make(array('gallery_id' => $gallery_id, 'site_id' => $site_id), array('gallery_id' => 'required|numeric|exists:gallery,id', 'site_id' => 'required'));
         if ($valid->passes()) {
             $all_active_gallery = Gallery::with('gallery_picture')
                     ->orderBy('id', 'desc')
-                    ->find($gallery_id);
+                    ->where('id', $gallery_id)
+                    ->where('site_id', $site_id)
+                    ->first();
+            
             $all_active_gallery = $all_active_gallery->toArray();
             foreach ($all_active_gallery['gallery_picture'] as &$each_picture) {
                 unset($each_picture['gallery_id']);
@@ -263,20 +271,73 @@ class ApiController extends BaseController {
 
         return Response::json($resp);
     }
+    
+    /**
+     * 
+     * @param type $path
+     * @param type $gallery_id
+     * @return int
+     */
+    private function deleteAlbum($path, $gallery_id){
+        $delete_result = File::deleteDirectory($path);
+        if ($delete_result) {
+            GalleryPicture::where('gallery_id', $gallery_id)->delete();
+            Gallery::where('id', $gallery_id)->delete();
+            $resp = array('code' => 200);
+        } else {
+            $resp = array('code' => 500);
+        }
+        return $resp;
+    }
 
+    /**
+     * 
+     * @param type $gallery_id
+     * @return type
+     */
     public function getDelGallery($gallery_id = null) {
-        $gallery_id = is_null($gallery_id) ? Input::get('gallery_id', null) : $gallery_id;
+        $is_cli = false;
+     
+        if($gallery_id == null){
+            $gallery_id = Input::get('gallery_id', null);
+            $is_cli = true;
+            $site_id = Input::get('site_id', null);
+                        
+            $valid_sample = array(
+                'gallery_id' => $gallery_id,
+                'site_id' => $site_id
+            );
+            
+            $valid_rule = array(
+                'gallery_id' => 'required|exists:gallery,id|numeric',
+                'site_id' => 'required'
+            );
+        }else{
+            $valid_sample = array('gallery_id' => $gallery_id);
+            $valid_rule = array('gallery_id' => 'required|exists:gallery,id|numeric');
+            $is_cli = false;
+        }
+        
         $resp = array();
-        $valid = Validator::make(array('gallery_id' => $gallery_id), array('gallery_id' => 'required|exists:gallery,id|numeric'));
-        if ($valid->passes()) {
-            $path = public_path("gallery/{$gallery_id}");
-            $delete_result = File::deleteDirectory($path);
-            if ($delete_result) {
-                GalleryPicture::where('gallery_id', $gallery_id)->delete();
-                Gallery::where('id', $gallery_id)->delete();
-                $resp = array('code' => 200);
-            } else {
-                $resp = array('code' => 500);
+        $valid = Validator::make($valid_sample, $valid_rule);
+        if ($valid->passes()) {            
+            
+            $path = public_path("gallery/{$gallery_id}");            
+            if($is_cli){     
+                /**
+                 * request from Cli
+                 */
+                $resp = $this->deleteAlbum($path, $gallery_id);
+            }else{
+                /**
+                 * request from User
+                 */
+                $total = Gallery::where('id', $gallery_id)->where('site_id', $site_id)->count();
+                if($total > 0){                    
+                    $resp = $this->deleteAlbum($path, $gallery_id);
+                }else{
+                    $resp = array('code' => 503);
+                }
             }
         } else {
             $resp = array('code' => 400);
@@ -284,6 +345,11 @@ class ApiController extends BaseController {
         return Response::json($resp);
     }
 
+    /**
+     * 
+     * @param type $picture_id
+     * @return type
+     */
     public function getDelPicture($picture_id = null) {
         $picture_id = is_null($picture_id) ? Input::get('picture_id', null) : $picture_id;
         $resp = array();
