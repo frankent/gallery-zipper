@@ -19,22 +19,32 @@ class ApiController extends BaseController {
     }
 
     public function getCreateAlbum() {
-        $temp = new Gallery();
-        $temp->name = NULL;
-        $temp->detail = NULL;
-        $temp->save();
-        $last_id = $temp->id;
+        $site_id = Input::get("site_id", NULL);
+        if($site_id != NULL){
+            $temp = new Gallery();
+            $temp->name = NULL;
+            $temp->site_id = $site_id;
+            $temp->detail = NULL;
+            $temp->save();
+            $last_id = $temp->id;
 
-        $path = "gallery/{$last_id}";
-        File::makeDirectory($path);
+            $path = "gallery/{$last_id}";
+            File::makeDirectory($path);
 
-        $path = "gallery/{$last_id}/zip";
-        File::makeDirectory($path);
-
-        return Response::json(array(
-                    'code' => 200,
-                    'result' => $temp
-        ));
+            $path = "gallery/{$last_id}/zip";
+            File::makeDirectory($path);   
+            
+            $resp = array(
+                'code' => 200,
+                'result' => $temp
+            );
+        }else{
+            $resp = array(
+                'code' => 400
+            );
+        }
+        
+        return Response::json($resp);
     }
 
     public function postUpdateAlbum() {
